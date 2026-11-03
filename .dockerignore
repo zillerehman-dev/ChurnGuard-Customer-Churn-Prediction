@@ -1,0 +1,6 @@
+.git
+__pycache__/
+*.pyc
+data/Telco_customer_churn.xlsx
+notebooks/
+.ipynb_checkpoints/
