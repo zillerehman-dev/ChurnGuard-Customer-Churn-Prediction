@@ -1,13 +1,3 @@
----
-title: ChurnGuard
-emoji: 📉
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 8501
-pinned: false
----
-
 # ChurnGuard: Customer Churn Prediction & Retention
 
 ChurnGuard predicts which telecom customers are likely to leave, explains why, and recommends whether a retention offer is worth making under a configurable cost model. It ships with a Streamlit app for single-customer and batch CSV scoring.
@@ -125,9 +115,22 @@ Artifacts in `models/` total under 400 KB, so the app needs no retraining or ext
 > **If you retrain, update this README.** Boosted-tree results can differ slightly between machines and library builds (the threshold moved between 0.32 and 0.35 across two runs here). All numbers in this README were produced with the library versions pinned in `requirements.txt` and seed 42. After any retrain, copy the numbers from `reports/evaluation_summary.md` into this file.
 
 ## Deployment
-**Streamlit Community Cloud (primary, live demo).** The app is a Streamlit app, so it is deployed on Streamlit Cloud: it builds straight from this GitHub repo and `requirements.txt` with no extra configuration, redeploys on every push, and has a free tier suitable for a demo. Entry point: `streamlit_app.py`; Python 3.12.
+**Streamlit Community Cloud (live demo).** The app is a Streamlit app, so it is deployed on Streamlit Cloud: it builds straight from this GitHub repo and `requirements.txt` with no extra configuration, redeploys on every push, and has a free tier suitable for a demo. Entry point: `streamlit_app.py`; Python 3.12.
 
-**Hugging Face Spaces (Docker SDK).** Hugging Face no longer has a built-in Streamlit SDK, so the Space uses `sdk: docker` and `app_port: 8501` (see the metadata at the top of this README) with the `Dockerfile` in this repo. An earlier attempt failed because the Space metadata said `sdk: gradio` while the code was a Streamlit app. To deploy: create a new Space with the Docker SDK, add it as a git remote and push this repo. The Docker image runs as a non-root user, as Spaces require.
+**Why not Hugging Face Spaces.** I tried to deploy there and could not complete it, for these reasons:
+1. *First attempt (configuration error on my side).* The Space metadata said `sdk: gradio`, but the code was a Streamlit app (`app.py` was a copy of `streamlit_app.py`), so it could not run as a Gradio Space.
+2. *Second attempt (Docker SDK).* Hugging Face no longer has a built-in Streamlit SDK, so a Streamlit app has to run as a Docker Space (`sdk: docker`, `app_port: 8501`). When I created a Docker Space on a free account, the sign-up page showed that Docker Spaces need a paid plan, so I could not deploy it for free.
+3. *Pushing the repo to the Space.* The push was rejected by the Hugging Face server with this message:
+   ```
+   remote: Your push was rejected because it contains binary files.
+   remote: Please use https://huggingface.co/docs/hub/xet to store binary files.
+   remote: Offending files:
+   remote:   - models/model.joblib (ref: refs/heads/main)
+   remote:   - reports/shap_summary.png (ref: refs/heads/main)
+   ```
+   Binary files must be uploaded through Hugging Face's own tooling instead of plain `git push`.
+
+Because the live demo already works on Streamlit Cloud for free, I did not pursue Hugging Face further, and the repo contains no Docker or Hugging Face setup.
 
 **Why Streamlit instead of Gradio.** The task stack mentions Gradio. Streamlit was chosen because it makes the single-customer form, the batch table with download and the explanation text easy to lay out on one page, and it deploys to Streamlit Cloud directly from GitHub with no extra files.
 
@@ -140,4 +143,4 @@ Artifacts in `models/` total under 400 KB, so the app needs no retraining or ext
 - Isotonic calibration was chosen by Brier score; it is slightly worse than sigmoid on log loss and can output probabilities near 0% or 100%.
 
 ## Technologies
-Python, pandas, NumPy, scikit-learn, imbalanced-learn, XGBoost, SHAP, Streamlit, Docker, Matplotlib, Seaborn, Joblib, Openpyxl, Jupyter.
+Python, pandas, NumPy, scikit-learn, imbalanced-learn, XGBoost, SHAP, Streamlit, Matplotlib, Seaborn, Joblib, Openpyxl, Jupyter.
