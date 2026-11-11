@@ -23,3 +23,8 @@ PR-AUC 0.6724, ROC-AUC 0.8538. At threshold 0.32: precision 0.546, recall 0.749,
 - README: removed the `scripts/check_readme.py` reference (the script no longer exists) and Docker from "Technologies", added a key-results table, a "Why not Hugging Face Spaces" section with the real errors, a "why Streamlit instead of Gradio" note, and a note that results were produced with the versions pinned in `requirements.txt`.
 - App: dollar signs are now escaped in `streamlit_app.py` so `$200` is no longer rendered as LaTeX math (checked with Streamlit's AppTest).
 - Git: history is no longer rewritten; every change is a separate commit.
+
+## Demo video
+https://www.loom.com/share/e02ab61b52a04553903ef844bb82fc77
+
+Shows a high-risk and a low-risk customer with the top 3 reasons, then a CSV upload with the scored table and the download.
