@@ -9,6 +9,12 @@ from src import business
 from src.data import CATEGORICAL, FEATURES, validate_input
 from src.explainability import ChurnExplainer
 
+
+def md(text):
+    """Escape dollar signs so Streamlit markdown does not render $...$ as LaTeX math."""
+    return str(text).replace("$", "\\$")
+
+
 MODELS = Path(__file__).resolve().parent / "models"
 REQUIRED = ["model.joblib", "explainer_pipeline.joblib", "background.csv", "metadata.json"]
 MAX_ROWS = 5000
@@ -70,21 +76,21 @@ with tab_one:
             res = predict_frame(validate_input(pd.DataFrame([row]))).iloc[0]
             icon = {"High": "🔴", "Medium": "🟠", "Low": "🟢"}[res["Risk Category"]]
             st.subheader(f"{icon} {res['Risk Category']} risk: {res['Churn Probability']:.1%} churn probability")
-            st.markdown(f"**Recommendation:** {res['Recommended Action']}  \n"
-                        f"**Expected net benefit of an offer:** ${res['Expected Net Benefit ($)']:,.2f}")
+            st.markdown(md(f"**Recommendation:** {res['Recommended Action']}  \n"
+                           f"**Expected net benefit of an offer:** ${res['Expected Net Benefit ($)']:,.2f}"))
             if pd.notna(res["Offer Priority"]):
-                st.markdown(f"**Value at stake (next {business.VALUE_HORIZON_MONTHS} months of billing):** "
-                            f"${res['Value at Stake ($)']:,.0f}  \n"
-                            f"**Expected value of an offer for this customer:** ${res['Expected Offer Value ($)']:,.2f}")
+                st.markdown(md(f"**Value at stake (next {business.VALUE_HORIZON_MONTHS} months of billing):** "
+                               f"${res['Value at Stake ($)']:,.0f}  \n"
+                               f"**Expected value of an offer for this customer:** ${res['Expected Offer Value ($)']:,.2f}"))
             st.markdown("**Top drivers**")
             for i in (1, 2, 3):
-                st.markdown(f"{i}. {res[f'Reason {i}']}")
+                st.markdown(md(f"{i}. {res[f'Reason {i}']}"))
             st.caption("The drivers explain the model's raw risk score (SHAP). The probability shown above is the "
                        "calibrated version of that score, so the two are consistent in direction but not identical in scale.")
             c = meta["costs"]
-            st.caption(f"Threshold {meta['threshold']:.0%}; break-even {meta['break_even_probability']:.1%}. "
-                       f"Estimates under illustrative assumptions (loss ${c['loss_cost']:.0f}, "
-                       f"offer ${c['offer_cost']:.0f}, {c['offer_success']:.0%} success).")
+            st.caption(md(f"Threshold {meta['threshold']:.0%}; break-even {meta['break_even_probability']:.1%}. "
+                          f"Estimates under illustrative assumptions (loss ${c['loss_cost']:.0f}, "
+                          f"offer ${c['offer_cost']:.0f}, {c['offer_success']:.0%} success)."))
         except ValueError as exc:
             st.error(f"⚠️ {exc}")
         except Exception as exc:
