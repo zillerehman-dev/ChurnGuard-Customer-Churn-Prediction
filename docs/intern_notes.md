@@ -16,10 +16,10 @@ PR-AUC 0.6724, ROC-AUC 0.8538. At threshold 0.32: precision 0.546, recall 0.749,
 
 ## Deployment
 - **Streamlit Community Cloud:** live at https://churnguard-customer-churn-prediction-cfs6yhah5jvsce2n5msxkt.streamlit.app/. Chosen because the app is Streamlit: it builds directly from the GitHub repo and `requirements.txt` and redeploys on push.
-- **Hugging Face Spaces:** the first attempt failed because the README metadata said `sdk: gradio` while the code was a Streamlit app (`app.py` was a copy of `streamlit_app.py`), and Hugging Face has no built-in Streamlit SDK. Fix in this repo: `sdk: docker` with `app_port: 8501` in the README metadata, a `Dockerfile` that runs as a non-root user, no unused `gradio` pin, and a single entry point (`streamlit_app.py`). The Dockerfile and `.dockerignore` are back in the repo; I had removed them earlier and have restored them.
+- **Hugging Face Spaces: not deployed.** First attempt failed because the README metadata said `sdk: gradio` while the code was a Streamlit app. Hugging Face has no built-in Streamlit SDK, so the app would need a Docker Space, which was not available on a free account when I tried. Pushing the repo to the Space was also rejected by the server: "Your push was rejected because it contains binary files" (offending files: `models/model.joblib`, `reports/shap_summary.png`). The full explanation is in the README under "Why not Hugging Face Spaces". The Dockerfile and Hugging Face metadata were removed because the app is deployed on Streamlit Cloud only.
 
 ## Fixes after the second supervisor review
 - Removed the template placeholders from this file.
-- README: removed the `scripts/check_readme.py` reference (the script no longer exists), added a key-results table, a Hugging Face deployment section, a "why Streamlit instead of Gradio" note, and a note that results were produced with the versions pinned in `requirements.txt`. Docker stays in "Technologies" because the Dockerfile is used for the Space.
+- README: removed the `scripts/check_readme.py` reference (the script no longer exists) and Docker from "Technologies", added a key-results table, a "Why not Hugging Face Spaces" section with the real errors, a "why Streamlit instead of Gradio" note, and a note that results were produced with the versions pinned in `requirements.txt`.
 - App: dollar signs are now escaped in `streamlit_app.py` so `$200` is no longer rendered as LaTeX math (checked with Streamlit's AppTest).
 - Git: history is no longer rewritten; every change is a separate commit.
