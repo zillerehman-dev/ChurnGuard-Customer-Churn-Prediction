@@ -13,6 +13,7 @@ Savings are estimates under illustrative cost assumptions (see "Threshold and co
 | | |
 |---|---|
 | Live app (Streamlit Cloud) | https://churnguard-customer-churn-prediction-cfs6yhah5jvsce2n5msxkt.streamlit.app/|
+| Demo video (2–3 min) | https://www.youtube.com/watch?v=YOUR_VIDEO_ID |
 
 
 ## Screenshots
