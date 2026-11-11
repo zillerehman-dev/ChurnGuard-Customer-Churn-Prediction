@@ -1,6 +1,23 @@
+---
+title: ChurnGuard
+emoji: 📉
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8501
+pinned: false
+---
+
 # ChurnGuard: Customer Churn Prediction & Retention
 
 ChurnGuard predicts which telecom customers are likely to leave, explains why, and recommends whether a retention offer is worth making under a configurable cost model. It ships with a Streamlit app for single-customer and batch CSV scoring.
+
+## Key results (held-out test set, 1,409 customers, scored once)
+| PR-AUC | ROC-AUC | Recall @ threshold 0.32 | Precision @ 0.32 | Expected saving vs no offers |
+|---|---|---|---|---|
+| 0.6724 | 0.8538 | 0.749 | 0.546 | $6,540 (assumed costs) |
+
+Savings are estimates under illustrative cost assumptions (see "Threshold and cost matrix").
 
 ## Links
 | | |
@@ -105,10 +122,14 @@ python train.py                    # rewrites models/ and reports/
 ```
 Artifacts in `models/` total under 400 KB, so the app needs no retraining or external downloads.
 
-> **If you retrain, update this README.** Boosted-tree results can differ slightly between machines and library builds (the threshold moved between 0.32 and 0.35 across two runs here), so after any retrain, copy the numbers from `reports/evaluation_summary.md` into this file. `python scripts/check_readme.py` checks the headline numbers against `models/metadata.json`.
+> **If you retrain, update this README.** Boosted-tree results can differ slightly between machines and library builds (the threshold moved between 0.32 and 0.35 across two runs here). All numbers in this README were produced with the library versions pinned in `requirements.txt` and seed 42. After any retrain, copy the numbers from `reports/evaluation_summary.md` into this file.
 
 ## Deployment
 **Streamlit Community Cloud (primary, live demo).** The app is a Streamlit app, so it is deployed on Streamlit Cloud: it builds straight from this GitHub repo and `requirements.txt` with no extra configuration, redeploys on every push, and has a free tier suitable for a demo. Entry point: `streamlit_app.py`; Python 3.12.
+
+**Hugging Face Spaces (Docker SDK).** Hugging Face no longer has a built-in Streamlit SDK, so the Space uses `sdk: docker` and `app_port: 8501` (see the metadata at the top of this README) with the `Dockerfile` in this repo. An earlier attempt failed because the Space metadata said `sdk: gradio` while the code was a Streamlit app. To deploy: create a new Space with the Docker SDK, add it as a git remote and push this repo. The Docker image runs as a non-root user, as Spaces require.
+
+**Why Streamlit instead of Gradio.** The task stack mentions Gradio. Streamlit was chosen because it makes the single-customer form, the batch table with download and the explanation text easy to lay out on one page, and it deploys to Streamlit Cloud directly from GitHub with no extra files.
 
 ## Limitations
 - Offer success rate, offer cost, loss cost and the 12-month value horizon are assumptions; savings are estimates, not proven revenue.
